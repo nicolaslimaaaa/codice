@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirme seu e-mail — Códice</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: #d4d1ce;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding: 40px 16px;
+    }
+
+    .wrapper {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background-color: #63c132;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg {
+      display: block;
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      color: #524632;
+      letter-spacing: -0.5px;
+    }
+
+    /* Card */
+    .card {
+      background-color: #e8e5e2;
+      border-radius: 20px;
+      padding: 40px 36px;
+      border: 1px solid rgba(82, 70, 50, 0.10);
+    }
+
+    /* Ícone central */
+    .icon-circle {
+      width: 64px;
+      height: 64px;
+      background-color: rgba(99, 193, 50, 0.12);
+      border-radius: 50%;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #524632;
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #7a6a55;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* Botão */
+    .btn-wrap {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #63c132;
+      color: #ffffff !important;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 14px 36px;
+      border-radius: 14px;
+      letter-spacing: 0.1px;
+    }
+
+    /* Separador */
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(82, 70, 50, 0.12);
+      margin: 24px 0;
+    }
+
+    /* Link alternativo */
+    .link-fallback {
+      font-size: 12px;
+      color: #7a6a55;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .link-fallback a {
+      color: #006e90;
+      word-break: break-all;
+    }
+
+    /* Aviso de segurança */
+    .security-note {
+      background-color: rgba(241, 143, 1, 0.08);
+      border: 1px solid rgba(241, 143, 1, 0.20);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 24px;
+    }
+
+    .security-note p {
+      font-size: 12px;
+      color: #7a6a55;
+      line-height: 1.6;
+    }
+
+    .security-note strong {
+      color: #f18f01;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 12px;
+      color: #9a8a75;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- Logo -->
+    <div class="header">
+      <div class="logo-wrap">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+        </div>
+        <span class="logo-text">Códice</span>
+      </div>
+    </div>
+
+    <!-- Card principal -->
+    <div class="card">
+
+      <!-- Ícone -->
+      <div class="icon-circle">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#63c132" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+      </div>
+
+      <h1>Confirme seu e-mail</h1>
+
+      <p class="subtitle">
+        Olá! Para ativar sua conta no <strong>Códice</strong> e começar a organizar suas aulas, clique no botão abaixo para confirmar seu endereço de e-mail.
+      </p>
+
+      <!-- CTA -->
+      <div class="btn-wrap">
+        <a href="{{ .ConfirmationURL }}" class="btn">
+          ✓ &nbsp; Confirmar e-mail
+        </a>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Link alternativo -->
+      <p class="link-fallback">
+        Se o botão não funcionar, copie e cole o link abaixo no seu navegador:<br />
+        <a href="{{ .ConfirmationURL }}">{{ .ConfirmationURL }}</a>
+      </p>
+
+      <!-- Aviso de segurança -->
+      <div class="security-note">
+        <p>
+          <strong>⚠ Atenção:</strong> Este link expira em <strong>24 horas</strong>. Se você não criou uma conta no Códice, pode ignorar este e-mail com segurança.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>Este e-mail foi enviado automaticamente pelo <strong>Códice</strong>.</p>
+      <p>Por favor, não responda a esta mensagem.</p>
+    </div>
+
+  </div>
+</body>
+</html>

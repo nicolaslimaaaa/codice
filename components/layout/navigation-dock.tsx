@@ -7,11 +7,9 @@ import {
   Users,
   FileText,
   DollarSign,
-  LogOut,
   User,
 } from "lucide-react";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/client";
 
 interface NavItem {
   id: string;
@@ -21,10 +19,11 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: "dashboard", label: "Início", href: "/dashboard", icon: LayoutDashboard },
-  { id: "students", label: "Alunos", href: "/dashboard/students", icon: Users },
-  { id: "materials", label: "Materiais", href: "/dashboard/materials", icon: FileText },
-  { id: "financial", label: "Financeiro", href: "/dashboard/financial", icon: DollarSign },
+  { id: "dashboard", label: "Início",     href: "/",          icon: LayoutDashboard },
+  { id: "students",  label: "Alunos",     href: "/students",  icon: Users           },
+  { id: "materials", label: "Materiais",  href: "/materials", icon: FileText        },
+  { id: "financial", label: "Financeiro", href: "/financial", icon: DollarSign      },
+  { id: "profile",   label: "Perfil",     href: "/profile",   icon: User            },
 ];
 
 interface NavigationDockProps {
@@ -34,68 +33,38 @@ interface NavigationDockProps {
 
 /**
  * Dock de navegação inferior glassmorphism.
- * Layout mobile-first com active indicator animado (Framer Motion layoutId).
+ * 5 itens — padrão HIG: Início à esquerda, Perfil à direita.
+ * Logout movido para dentro da página de Perfil.
  */
 export function NavigationDock({ avatarUrl, userName }: NavigationDockProps) {
   const pathname = usePathname();
   const router = useRouter();
-
-  async function handleSignOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/auth/login");
-    router.refresh();
-  }
 
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 pt-0"
       aria-label="Navegação principal"
     >
-      {/* Container do dock */}
       <div
-        className="glass rounded-2xl mx-auto max-w-md shadow-lg"
+        className="rounded-2xl mx-auto max-w-md shadow-lg"
         style={{
-          background: "rgba(222, 219, 216, 0.75)",
+          background: "rgba(222, 219, 216, 0.80)",
           backdropFilter: "blur(16px)",
           WebkitBackdropFilter: "blur(16px)",
           border: "1px solid rgba(82, 70, 50, 0.12)",
         }}
       >
         <div className="flex items-center justify-around px-2 py-2">
-          {/* Avatar / Perfil */}
-          <button
-            id="nav-profile"
-            onClick={handleSignOut}
-            className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-200 hover:bg-[#524632]/8 group"
-            aria-label={`${userName ?? "Perfil"} — Sair`}
-            title="Sair"
-          >
-            <div className="w-7 h-7 rounded-full overflow-hidden bg-[#63c132]/20 flex items-center justify-center">
-              {avatarUrl ? (
-                <Image
-                  src={avatarUrl}
-                  alt={userName ?? "Avatar"}
-                  width={28}
-                  height={28}
-                  className="object-cover w-full h-full"
-                />
-              ) : (
-                <User size={14} style={{ color: "#63c132" }} />
-              )}
-            </div>
-            <span className="text-[10px] font-medium" style={{ color: "#7a6a55" }}>
-              Sair
-            </span>
-          </button>
-
-          {/* Itens de navegação */}
           {NAV_ITEMS.map((item) => {
-            const isActive =
-              item.href === "/dashboard"
-                ? pathname === "/dashboard"
-                : pathname.startsWith(item.href);
-            const Icon = item.icon;
+            const isProfile = item.id === "profile";
+
+            // Perfil: ativo quando pathname inicia com /profile
+            // Início: ativo apenas em pathname === "/"
+            const isActive = isProfile
+              ? pathname.startsWith("/profile")
+              : item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
 
             return (
               <button
@@ -116,13 +85,35 @@ export function NavigationDock({ avatarUrl, userName }: NavigationDockProps) {
                   />
                 )}
 
-                <Icon
-                  size={20}
-                  style={{
-                    color: isActive ? "#63c132" : "#7a6a55",
-                    transition: "color 0.2s",
-                  }}
-                />
+                {/* Ícone — Perfil usa avatar se disponível */}
+                <div className="relative z-10">
+                  {isProfile && avatarUrl ? (
+                    <div
+                      className="w-5 h-5 rounded-full overflow-hidden"
+                      style={{
+                        outline: isActive ? "2px solid #63c132" : "2px solid transparent",
+                        outlineOffset: "1px",
+                      }}
+                    >
+                      <Image
+                        src={avatarUrl}
+                        alt={userName ?? "Avatar"}
+                        width={20}
+                        height={20}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                  ) : (
+                    <item.icon
+                      size={20}
+                      style={{
+                        color: isActive ? "#63c132" : "#7a6a55",
+                        transition: "color 0.2s",
+                      }}
+                    />
+                  )}
+                </div>
+
                 <span
                   className="text-[10px] font-medium relative z-10"
                   style={{
@@ -135,26 +126,6 @@ export function NavigationDock({ avatarUrl, userName }: NavigationDockProps) {
               </button>
             );
           })}
-
-          {/* Ícone de logout extra no final */}
-          <button
-            id="nav-logout"
-            onClick={handleSignOut}
-            className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-200 hover:bg-red-50 group"
-            aria-label="Sair da conta"
-          >
-            <LogOut
-              size={20}
-              className="group-hover:text-red-400 transition-colors"
-              style={{ color: "#7a6a55" }}
-            />
-            <span
-              className="text-[10px] font-medium group-hover:text-red-400 transition-colors"
-              style={{ color: "#7a6a55" }}
-            >
-              Sair
-            </span>
-          </button>
         </div>
       </div>
     </nav>
