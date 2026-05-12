@@ -86,3 +86,33 @@ export function useCreateStudent() {
 
   return { createStudent, loading, error };
 }
+
+/**
+ * Hook para deletar um aluno.
+ */
+export function useDeleteStudent() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const deleteStudent = useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+
+    const supabase = createClient();
+    const { error: deleteError } = await supabase
+      .from("students")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      setLoading(false);
+      return false;
+    }
+
+    setLoading(false);
+    return true;
+  }, []);
+
+  return { deleteStudent, loading, error };
+}

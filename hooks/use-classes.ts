@@ -2,16 +2,18 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { ClassFormData } from "@/lib/validations";
+
+export type ClassStatus = "scheduled" | "completed" | "paid";
 
 export interface ClassWithStudent {
   id: string;
-  student_id: string;
-  date: string;
-  start_time: string;
-  end_time: string;
+  student_id: string | null;
+  user_id: string;
+  date: string;          // "YYYY-MM-DD"
+  start_time: string;    // "HH:MM:SS"
+  end_time: string;      // "HH:MM:SS"
   price: number;
-  status: "scheduled" | "completed" | "paid";
+  status: ClassStatus;
   created_at: string;
   students: {
     id: string;
@@ -20,8 +22,18 @@ export interface ClassWithStudent {
   } | null;
 }
 
+export interface CreateClassData {
+  student_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  price: number;
+}
+
+// ─── useClasses ───────────────────────────────────────────────────────────────
+
 /**
- * Hook para listar aulas com dados do aluno relacionado.
+ * Lista todas as aulas do professor autenticado, com join em students.
  */
 export function useClasses() {
   const [classes, setClasses] = useState<ClassWithStudent[]>([]);
@@ -35,19 +47,15 @@ export function useClasses() {
     const supabase = createClient();
     const { data, error: fetchError } = await supabase
       .from("classes")
-      .select(`
-        *,
-        students (id, name, grade)
-      `)
+      .select("*, students(id, name, grade)")
       .order("date", { ascending: true })
       .order("start_time", { ascending: true });
 
     if (fetchError) {
       setError(fetchError.message);
     } else {
-      setClasses((data ?? []) as ClassWithStudent[]);
+      setClasses((data as ClassWithStudent[]) ?? []);
     }
-
     setLoading(false);
   }, []);
 
@@ -58,6 +66,8 @@ export function useClasses() {
   return { classes, loading, error, refetch: fetchClasses };
 }
 
+// ─── useCreateClass ───────────────────────────────────────────────────────────
+
 /**
  * Hook para criar uma nova aula.
  */
@@ -65,12 +75,14 @@ export function useCreateClass() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createClass = useCallback(async (data: ClassFormData) => {
+  async function createClass(data: CreateClassData): Promise<ClassWithStudent | null> {
     setLoading(true);
     setError(null);
 
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       setError("Usuário não autenticado.");
@@ -78,10 +90,10 @@ export function useCreateClass() {
       return null;
     }
 
-    const { data: classData, error: insertError } = await supabase
+    const { data: created, error: insertError } = await supabase
       .from("classes")
-      .insert({ ...data, user_id: user.id })
-      .select(`*, students(id, name, grade)`)
+      .insert({ ...data, user_id: user.id, status: "scheduled" })
+      .select("*, students(id, name, grade)")
       .single();
 
     if (insertError) {
@@ -91,8 +103,41 @@ export function useCreateClass() {
     }
 
     setLoading(false);
-    return classData as ClassWithStudent;
-  }, []);
+    return created as ClassWithStudent;
+  }
 
   return { createClass, loading, error };
+}
+
+// ─── useUpdateClassStatus ─────────────────────────────────────────────────────
+
+const STATUS_CYCLE: ClassStatus[] = ["scheduled", "completed", "paid"];
+
+/**
+ * Avança o status de uma aula no ciclo: scheduled → completed → paid → scheduled.
+ */
+export function useUpdateClassStatus() {
+  const [loading, setLoading] = useState(false);
+
+  async function cycleStatus(
+    classId: string,
+    currentStatus: ClassStatus
+  ): Promise<ClassStatus | null> {
+    setLoading(true);
+
+    const nextIndex = (STATUS_CYCLE.indexOf(currentStatus) + 1) % STATUS_CYCLE.length;
+    const nextStatus = STATUS_CYCLE[nextIndex];
+
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("classes")
+      .update({ status: nextStatus })
+      .eq("id", classId);
+
+    setLoading(false);
+    if (error) return null;
+    return nextStatus;
+  }
+
+  return { cycleStatus, loading };
 }

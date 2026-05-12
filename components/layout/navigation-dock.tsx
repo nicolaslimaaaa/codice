@@ -5,8 +5,7 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   Users,
-  FileText,
-  DollarSign,
+  CalendarDays,
   User,
 } from "lucide-react";
 import Image from "next/image";
@@ -19,11 +18,10 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: "dashboard", label: "Início",     href: "/",          icon: LayoutDashboard },
-  { id: "students",  label: "Alunos",     href: "/students",  icon: Users           },
-  { id: "materials", label: "Materiais",  href: "/materials", icon: FileText        },
-  { id: "financial", label: "Financeiro", href: "/financial", icon: DollarSign      },
-  { id: "profile",   label: "Perfil",     href: "/profile",   icon: User            },
+  { id: "dashboard", label: "Início",  href: "/",        icon: LayoutDashboard },
+  { id: "classes",   label: "Aulas",   href: "/classes", icon: CalendarDays    },
+  { id: "students",  label: "Alunos",  href: "/students",icon: Users           },
+  { id: "profile",   label: "Perfil",  href: "/profile", icon: User            },
 ];
 
 interface NavigationDockProps {
