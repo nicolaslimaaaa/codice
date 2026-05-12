@@ -52,7 +52,7 @@ export function NavigationDock({ avatarUrl, userName }: NavigationDockProps) {
           border: "1px solid rgba(82, 70, 50, 0.12)",
         }}
       >
-        <div className="flex items-center justify-around px-2 py-2">
+        <div className="flex items-center justify-around px-2 py-1.5">
           {NAV_ITEMS.map((item) => {
             const isProfile = item.id === "profile";
 
@@ -69,7 +69,7 @@ export function NavigationDock({ avatarUrl, userName }: NavigationDockProps) {
                 key={item.id}
                 id={`nav-${item.id}`}
                 onClick={() => router.push(item.href)}
-                className="relative flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-200 hover:bg-[#524632]/8"
+                className="relative flex flex-col items-center justify-center gap-1 w-[72px] h-[52px] rounded-xl transition-all duration-200 hover:bg-[#524632]/8"
                 aria-label={item.label}
                 aria-current={isActive ? "page" : undefined}
               >

@@ -95,10 +95,10 @@ export default function RegisterPage() {
 
   const inputClass = (hasError: boolean) =>
     [
-      "w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200",
-      "bg-[#e8e5e2] border placeholder:text-[#524632]/40",
-      "focus:border-[#63c132] focus:ring-2 focus:ring-[#63c132]/20",
-      hasError ? "border-red-400 ring-2 ring-red-200" : "border-[#524632]/15",
+      "w-full px-4 py-3.5 rounded-xl text-sm outline-none transition-all duration-200",
+      "bg-white/40 border shadow-sm backdrop-blur-sm placeholder:text-[#524632]/40",
+      "focus:bg-white/60 focus:border-[#63c132] focus:ring-2 focus:ring-[#63c132]/20",
+      hasError ? "border-red-400 ring-2 ring-red-200 bg-red-50/50" : "border-[#524632]/15 hover:border-[#524632]/30",
     ].join(" ");
 
   return (
