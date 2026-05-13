@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Clock, DollarSign } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Clock, DollarSign, Trash2 } from "lucide-react";
 import type { ClassWithStudent, ClassStatus } from "@/hooks/use-classes";
 
 interface ClassCardProps {
   lesson: ClassWithStudent;
   onStatusChange: (id: string, current: ClassStatus) => void;
+  onDelete: (id: string) => void;
   updatingId?: string | null;
 }
 
@@ -70,10 +71,13 @@ function fmtDuration(min: number): string {
  * Card de aula individual.
  * Badge de status é clicável e cicla: scheduled → completed → paid → scheduled.
  */
-export function ClassCard({ lesson, onStatusChange, updatingId }: ClassCardProps) {
+export function ClassCard({ lesson, onStatusChange, onDelete, updatingId }: ClassCardProps) {
   const student = lesson.students;
   const statusCfg = STATUS_CONFIG[lesson.status];
   const isUpdating = updatingId === lesson.id;
+
+  // Estado interno para confirmar exclusão
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   // Avatar
   const name = student?.name ?? "—";
@@ -95,69 +99,126 @@ export function ClassCard({ lesson, onStatusChange, updatingId }: ClassCardProps
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -20, transition: { duration: 0.18 } }}
       transition={{ duration: 0.28 }}
-      className="rounded-2xl px-4 py-3.5 flex items-center gap-3"
+      className="rounded-2xl px-4 py-3.5 flex flex-col gap-3 overflow-hidden"
       style={{
         backgroundColor: "#e8e5e2",
         border: "1px solid rgba(82, 70, 50, 0.10)",
       }}
     >
-      {/* Avatar */}
-      <div
-        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold"
-        style={{ backgroundColor: color.bg, color: color.text }}
-      >
-        {initials}
-      </div>
+      <div className="flex items-center gap-3 w-full">
+        {/* Avatar */}
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold"
+          style={{ backgroundColor: color.bg, color: color.text }}
+        >
+          {initials}
+        </div>
 
-      {/* Dados principais */}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold truncate" style={{ color: "#524632" }}>
-          {name}
-        </p>
-        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-          {/* Horário */}
-          <span
-            className="inline-flex items-center gap-1 text-xs"
-            style={{ color: "#7a6a55" }}
-          >
-            <Clock size={11} />
-            {fmtTime(lesson.start_time)} – {fmtTime(lesson.end_time)}
-            {dur > 0 && (
-              <span style={{ color: "#9a8a75" }}>({fmtDuration(dur)})</span>
-            )}
-          </span>
-
-          {/* Valor */}
-          {price > 0 && (
+        {/* Dados principais */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold truncate" style={{ color: "#524632" }}>
+            {name}
+          </p>
+          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+            {/* Horário */}
             <span
               className="inline-flex items-center gap-1 text-xs"
               style={{ color: "#7a6a55" }}
             >
-              <DollarSign size={11} />
-              {price.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
+              <Clock size={11} />
+              {fmtTime(lesson.start_time)} – {fmtTime(lesson.end_time)}
+              {dur > 0 && (
+                <span style={{ color: "#9a8a75" }}>({fmtDuration(dur)})</span>
+              )}
             </span>
-          )}
+
+            {/* Valor */}
+            {price > 0 && (
+              <span
+                className="inline-flex items-center gap-1 text-xs"
+                style={{ color: "#7a6a55" }}
+              >
+                <DollarSign size={11} />
+                {price.toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <AnimatePresence mode="wait">
+            {showConfirmDelete ? (
+              <motion.div
+                key="confirm"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex items-center gap-2 flex-shrink-0"
+              >
+                <button
+                  onClick={() => setShowConfirmDelete(false)}
+                  className="text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors"
+                  style={{ backgroundColor: "rgba(82, 70, 50, 0.08)", color: "#524632" }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    setShowConfirmDelete(false);
+                    onDelete(lesson.id);
+                  }}
+                  disabled={isUpdating}
+                  className="text-xs px-2.5 py-1.5 rounded-lg font-semibold transition-colors"
+                  style={{ backgroundColor: "rgba(239, 68, 68, 0.10)", color: "#ef4444" }}
+                >
+                  {isUpdating ? "…" : "Excluir"}
+                </button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="actions"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-2 flex-shrink-0"
+              >
+                {/* Badge de status clicável */}
+                <button
+                  type="button"
+                  onClick={() => onStatusChange(lesson.id, lesson.status)}
+                  disabled={isUpdating}
+                  title={statusCfg.nextLabel}
+                  className="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 active:scale-95"
+                  style={{
+                    backgroundColor: statusCfg.bg,
+                    color: statusCfg.text,
+                    opacity: isUpdating ? 0.5 : 1,
+                  }}
+                >
+                  {isUpdating ? "…" : statusCfg.label}
+                </button>
+
+                {/* Botão para iniciar exclusão */}
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmDelete(true)}
+                  className="p-1.5 rounded-lg transition-colors hover:bg-red-50 group"
+                  aria-label="Excluir aula"
+                >
+                  <Trash2
+                    size={15}
+                    className="group-hover:text-red-400 transition-colors"
+                    style={{ color: "#9a8a75" }}
+                  />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-
-      {/* Badge de status clicável */}
-      <button
-        type="button"
-        onClick={() => onStatusChange(lesson.id, lesson.status)}
-        disabled={isUpdating}
-        title={statusCfg.nextLabel}
-        className="flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-200 active:scale-95"
-        style={{
-          backgroundColor: statusCfg.bg,
-          color: statusCfg.text,
-          opacity: isUpdating ? 0.5 : 1,
-        }}
-      >
-        {isUpdating ? "…" : statusCfg.label}
-      </button>
     </motion.div>
   );
 }

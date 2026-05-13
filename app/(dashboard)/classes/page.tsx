@@ -7,6 +7,7 @@ import { CalendarDays, BookOpen, FileText, ChevronRight } from "lucide-react";
 import {
   useClasses,
   useUpdateClassStatus,
+  useDeleteClass,
   type ClassStatus,
   type ClassWithStudent,
 } from "@/hooks/use-classes";
@@ -87,6 +88,7 @@ export default function ClassesPage() {
   const router = useRouter();
   const { classes, loading, refetch } = useClasses();
   const { cycleStatus } = useUpdateClassStatus();
+  const { deleteClass } = useDeleteClass();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [filter, setFilter] = useState<Filter>("all");
@@ -105,6 +107,13 @@ export default function ClassesPage() {
     setUpdatingId(id);
     const next = await cycleStatus(id, current);
     if (next) refetch();
+    setUpdatingId(null);
+  }
+
+  async function handleDelete(id: string) {
+    setUpdatingId(id);
+    const success = await deleteClass(id);
+    if (success) refetch();
     setUpdatingId(null);
   }
 
@@ -229,6 +238,7 @@ export default function ClassesPage() {
                           key={lesson.id}
                           lesson={lesson}
                           onStatusChange={handleStatusChange}
+                          onDelete={handleDelete}
                           updatingId={updatingId}
                         />
                       ))}
@@ -293,55 +303,6 @@ export default function ClassesPage() {
               <CalendarDays size={16} />
               Cadastrar primeira aula
             </motion.button>
-          </motion.div>
-        )}
-
-        {/* ── Acesso rápido a Materiais ── */}
-        {!loading && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.15, ease: EASE }}
-            className="mt-6"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <span
-                className="text-xs font-semibold uppercase tracking-wide"
-                style={{ color: "#7a6a55" }}
-              >
-                Materiais
-              </span>
-              <div
-                className="flex-1 h-px"
-                style={{ backgroundColor: "rgba(82, 70, 50, 0.10)" }}
-              />
-            </div>
-            <button
-              id="materials-shortcut-btn"
-              type="button"
-              onClick={() => router.push("/materials")}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200 active:scale-[0.98]"
-              style={{
-                backgroundColor: "#e8e5e2",
-                border: "1px solid rgba(82, 70, 50, 0.10)",
-              }}
-            >
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: "rgba(0, 110, 144, 0.12)" }}
-              >
-                <FileText size={17} style={{ color: "#006e90" }} />
-              </div>
-              <div className="flex-1 text-left">
-                <p className="text-sm font-semibold" style={{ color: "#524632" }}>
-                  Materiais Didáticos
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: "#7a6a55" }}>
-                  PDFs, exercícios e recursos de aula
-                </p>
-              </div>
-              <ChevronRight size={16} style={{ color: "#c4b9a8" }} />
-            </button>
           </motion.div>
         )}
 

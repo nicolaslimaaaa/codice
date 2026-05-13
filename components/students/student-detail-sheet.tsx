@@ -57,6 +57,8 @@ function InfoRow({
   );
 }
 
+import { StudentMaterialsSection } from "@/components/students/student-materials-section";
+
 /**
  * Sheet de detalhes do aluno.
  * Exibe todas as informações cadastradas e permite excluir.
@@ -160,6 +162,9 @@ export function StudentDetailSheet({
               Nenhuma informação adicional cadastrada.
             </p>
           )}
+
+          {/* Seção de Materiais do Aluno (OPÇÃO B) */}
+          <StudentMaterialsSection studentId={student.id} />
 
           {/* Aulas futuras — placeholder */}
           <div

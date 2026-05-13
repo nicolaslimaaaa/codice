@@ -7,6 +7,8 @@ import {
   Users,
   CalendarDays,
   User,
+  FileText,
+  DollarSign,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -21,6 +23,8 @@ const NAV_ITEMS: NavItem[] = [
   { id: "dashboard", label: "Início",  href: "/",        icon: LayoutDashboard },
   { id: "classes",   label: "Aulas",   href: "/classes", icon: CalendarDays    },
   { id: "students",  label: "Alunos",  href: "/students",icon: Users           },
+  { id: "materials", label: "Materiais",href: "/materials",icon: FileText      },
+  { id: "financial", label: "Financeiro",href: "/financial",icon: DollarSign    },
   { id: "profile",   label: "Perfil",  href: "/profile", icon: User            },
 ];
 
@@ -69,7 +73,7 @@ export function NavigationDock({ avatarUrl, userName }: NavigationDockProps) {
                 key={item.id}
                 id={`nav-${item.id}`}
                 onClick={() => router.push(item.href)}
-                className="relative flex flex-col items-center justify-center gap-1 w-[72px] h-[52px] rounded-xl transition-all duration-200 hover:bg-[#524632]/8"
+                className="relative flex flex-col items-center justify-center gap-1 flex-1 min-w-0 h-[52px] rounded-xl transition-all duration-200 hover:bg-[#524632]/8"
                 aria-label={item.label}
                 aria-current={isActive ? "page" : undefined}
               >

@@ -141,3 +141,31 @@ export function useUpdateClassStatus() {
 
   return { cycleStatus, loading };
 }
+
+// ─── useDeleteClass ───────────────────────────────────────────────────────────
+
+export function useDeleteClass() {
+  const [loading, setLoading] = useState(false);
+
+  async function deleteClass(classId: string): Promise<boolean> {
+    setLoading(true);
+    
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("classes")
+      .delete()
+      .eq("id", classId);
+
+    setLoading(false);
+    
+    if (error) {
+      console.error("Erro ao deletar aula:", error);
+      return false;
+    }
+    
+    return true;
+  }
+
+  return { deleteClass, loading };
+}
+
