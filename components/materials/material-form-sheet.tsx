@@ -108,6 +108,7 @@ export function MaterialFormSheet({ open, onOpenChange, onSuccess }: MaterialFor
         </SheetHeader>
 
         <form
+          id="material-form"
           onSubmit={handleSubmit(onSubmit)}
           noValidate
           className="flex-1 overflow-y-auto px-6 pb-6 pt-4 space-y-5"
@@ -191,7 +192,7 @@ export function MaterialFormSheet({ open, onOpenChange, onSuccess }: MaterialFor
         <div className="p-6 border-t border-[#524632]/10 bg-[#f5f4f1]">
           <button
             type="submit"
-            onClick={handleSubmit(onSubmit)}
+            form="material-form"
             disabled={loading}
             className={[
               "w-full py-3.5 rounded-xl text-sm font-bold text-white shadow-sm flex items-center justify-center gap-2",
